@@ -1,4 +1,4 @@
-"""Module for database controls.
+ """Module for database controls.
 
 >>> Database
 

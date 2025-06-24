@@ -5,6 +5,15 @@ __pycache__
 .pytest_cache
 *venv*/
 
+.vs/
+.env
+.env.txt
+*.bak
+*.bak[0-9]
+venv/
+__pycache__/
+*.pyc
+
 # module generated
 did.bin
 

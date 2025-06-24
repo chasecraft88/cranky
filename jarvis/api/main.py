@@ -1,40 +1,24 @@
-from contextlib import asynccontextmanager
-from threading import Thread
-
 from fastapi import FastAPI
+from jarvis.api import surveillance, ai_integration
+import uvicorn
+import os
+from dotenv import load_dotenv
 
-from jarvis import version
-from jarvis.api import entrypoint
-from jarvis.api.logger import logger
-from jarvis.api.routers import routes
-from jarvis.api.squire import stockanalysis_squire
-from jarvis.modules.models import models
+load_dotenv()
 
-
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    """Simple startup function to add anything that has to be triggered when Jarvis API starts up."""
-    logger.info(
-        "Hosting at http://%s:%s", models.env.offline_host, models.env.offline_port
-    )
-    if models.env.author_mode:
-        Thread(target=stockanalysis_squire.nasdaq).start()
-    entrypoint.startup()
-    yield
-
-
-# Initiate API
 app = FastAPI(
     title="Jarvis API",
-    description="#### Gateway to communicate with Jarvis, and an entry point for the UI.\n\n"
-    "**Contact:** [https://vigneshrao.com/contact](https://vigneshrao.com/contact)",
-    version=version,
-    lifespan=lifespan,
+    description="Gateway to communicate with Jarvis and entry point for the UI.",
+    version="1.0.0"
 )
+app.include_router(surveillance.router)
+app.include_router(ai_integration.app, prefix="/ai")
 
-# Include all the routers
-# WATCH OUT: for changes in function name
-if models.settings.pname == "jarvis_api":  # Avoid looping when called by subprocesses
-    # Cannot add middleware after an application has started
-    app.add_middleware(**entrypoint.get_cors_params())
-    app.routes.extend(routes.get_all_routes())
+if __name__ == "__main__":
+    uvicorn.run(
+        app,
+        host="127.0.0.1",
+        port=8443,
+        ssl_keyfile="C:/Users/XxUse/source/repos/cranky/key.pem",
+        ssl_certfile="C:/Users/XxUse/source/repos/cranky/cert.pem"
+    )

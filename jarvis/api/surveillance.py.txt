@@ -1,0 +1,7 @@
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/surveillance")
+async def surveillance_status():
+    return {"status": "Surveillance module not implemented"}
